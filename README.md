@@ -35,7 +35,7 @@ The project focuses on four musical genres:
 - Metal
 - Pop
 
-The implementation follows the methodology of the reference paper and additionally applies classification-only fine-tuning to improve the final classification performance.
+The implementation follows the methodology of the reference paper and additionally applies classification-only fine-tuning, MFCC-based classification, and DSAE latent-feature fusion experiments to improve and compare the final classification performance.
 
 ---
 
@@ -52,7 +52,10 @@ The objective of this project is to investigate whether useful features for musi
 3. Use the learned latent representation for genre classification.
 4. Compare the DSAE against a neural network baseline.
 5. Improve classification performance using classification-only fine-tuning.
-6. Evaluate the final model on a held-out test set.
+6. Extract MFCC features as an additional engineered feature representation.
+7. Evaluate MFCC features using an RBF-SVM classifier.
+8. Combine DSAE latent features with MFCC features and evaluate the fused representation.
+9. Evaluate the final models on a held-out test set.
 
 ---
 
@@ -121,6 +124,14 @@ The processed dataset is divided into training, development, and test sets.
 | Development | 997 |
 | Test | 998 |
 | **Total** | **7980** |
+
+### Processed Raw Feature Shapes
+
+| Dataset | Feature Shape |
+|---|---:|
+| Training | (5985, 500) |
+| Development | (997, 500) |
+| Test | (998, 500) |
 
 The test set is kept separate and is used only for final evaluation.
 
@@ -263,21 +274,157 @@ The pretrained DSAE checkpoint is loaded and further trained using only the clas
 
 The best model is selected using development-set accuracy.
 
+The best development accuracy was **62.29% at epoch 47**.
+
 The final fine-tuned model is saved as:
 
 ```text
 dsae_finetuned.pth
 ```
 
+The final fine-tuned DSAE achieved a test accuracy of:
+
+**62.83%**
+
 ---
 
-## 11. Final Results
+## 11. MFCC Feature Extraction
+
+In addition to the raw-audio representation used by the DSAE, **Mel-Frequency Cepstral Coefficients (MFCCs)** are extracted as a conventional engineered audio feature representation.
+
+The extracted MFCC representation contains **78 features per example**.
+
+### MFCC Feature Shapes
+
+| Dataset | Feature Shape |
+|---|---:|
+| Training | (5985, 78) |
+| Development | (997, 78) |
+| Test | (998, 78) |
+
+The generated MFCC features are saved as:
+
+```text
+Data/processed/mfcc_train.npy
+Data/processed/mfcc_dev.npy
+Data/processed/mfcc_test.npy
+```
+
+---
+
+## 12. MFCC + RBF-SVM
+
+The extracted MFCC features are evaluated using an **RBF-kernel Support Vector Machine (SVM)**.
+
+### Best Configuration
+
+| Parameter | Value |
+|---|---|
+| Kernel | RBF |
+| C | 1 |
+| Gamma | scale |
+
+### Classification Accuracy
+
+| Dataset | Accuracy |
+|---|---:|
+| Training | 97.53% |
+| Development | 95.49% |
+| Test | **95.09%** |
+
+### Classification Report
+
+| Genre | Precision | Recall | F1-Score |
+|---|---:|---:|---:|
+| Classical | 0.9266 | 0.9600 | 0.9430 |
+| Jazz | 0.9402 | 0.8871 | 0.9129 |
+| Metal | 1.0000 | 0.9720 | 0.9858 |
+| Pop | 0.9389 | 0.9840 | 0.9609 |
+
+### Confusion Matrix
+
+```text
+[[240   9   0   1]
+ [ 17 220   0  11]
+ [  1   2 243   4]
+ [  1   3   0 246]]
+```
+
+The MFCC + RBF-SVM experiment provides a strong conventional-feature baseline for comparison with the DSAE-based approach.
+
+---
+
+## 13. DSAE + MFCC Feature Fusion
+
+To evaluate whether the learned DSAE representation contains complementary information to conventional audio features, the **64-dimensional DSAE latent representation** is concatenated with the **78-dimensional MFCC representation**.
+
+### Fused Feature Representation
+
+```text
+DSAE Latent Features: 64
+          +
+MFCC Features: 78
+          ↓
+Combined Representation: 142
+```
+
+### Feature Shapes
+
+| Dataset | Feature Shape |
+|---|---:|
+| Training | (5985, 142) |
+| Development | (997, 142) |
+| Test | (998, 142) |
+
+The fused features are evaluated using an RBF-SVM classifier.
+
+### Best Configuration
+
+| Parameter | Value |
+|---|---|
+| Kernel | RBF |
+| C | 100 |
+| Gamma | 0.001 |
+
+### Classification Accuracy
+
+| Dataset | Accuracy |
+|---|---:|
+| Training | 98.81% |
+| Development | 91.68% |
+| Test | **90.48%** |
+
+### Classification Report
+
+| Genre | Precision | Recall | F1-Score |
+|---|---:|---:|---:|
+| Classical | 0.9170 | 0.8400 | 0.8768 |
+| Jazz | 0.8083 | 0.8669 | 0.8366 |
+| Metal | 0.9878 | 0.9680 | 0.9778 |
+| Pop | 0.9147 | 0.9440 | 0.9291 |
+
+### Confusion Matrix
+
+```text
+[[210  33   0   7]
+ [ 16 215   2  15]
+ [  2   6 242   0]
+ [  1  12   1 236]]
+```
+
+The fusion experiment shows that combining learned DSAE latent features with MFCC features provides a strong representation, although its test performance is lower than the MFCC-only RBF-SVM result.
+
+---
+
+## 14. Final Results
 
 | Model | Test Accuracy |
 |---|---:|
 | Baseline Neural Network | **50.90%** |
 | DSAE | **60.22%** |
 | DSAE + Fine-Tuning | **62.83%** |
+| MFCC + RBF-SVM | **95.09%** |
+| DSAE + MFCC + RBF-SVM | **90.48%** |
 | Reference Paper DSAE | **65.30%** |
 
 ### Improvement
@@ -292,9 +439,13 @@ It improves over the original DSAE by:
 
 The final implementation is **2.47 percentage points** below the 65.30% test accuracy reported in the reference paper.
 
+The additional MFCC experiment achieved **95.09%** test accuracy using an RBF-SVM, while the DSAE + MFCC fused representation achieved **90.48%**.
+
+The DSAE remains the main learned representation in the project, while the MFCC experiments provide additional feature-engineering and comparison baselines.
+
 ---
 
-## 12. Final Classification Performance
+## 15. Final Classification Performance
 
 The final fine-tuned DSAE achieved an overall test accuracy of:
 
@@ -312,7 +463,7 @@ The final fine-tuned DSAE achieved an overall test accuracy of:
 
 ---
 
-## 13. Confusion Matrix
+## 16. Confusion Matrix
 
 The final confusion matrix is:
 
@@ -329,7 +480,7 @@ The largest confusion occurs between **Metal and Pop**, indicating that these ge
 
 ---
 
-## 14. Project Pipeline
+## 17. Project Pipeline
 
 ```text
 GTZAN Audio Dataset
@@ -344,33 +495,45 @@ Average Pooling
         ↓
 Train / Development / Test Split
         ↓
-        ┌──────────────────┐
-        │                  │
-        ↓                  ↓
- Baseline Model        DSAE Model
-        │                  │
-        ↓                  ↓
- Baseline Result      Latent Features
-                           │
-                           ↓
-                     Classification
-                           │
-                           ↓
-                      DSAE Result
-                           │
-                           ↓
-                Classification Fine-Tuning
-                           │
-                           ↓
-                    Final Prediction
-                           │
-                           ↓
-                       62.83%
+        ┌──────────────────────────────┐
+        │                              │
+        ↓                              ↓
+ Baseline Model                    DSAE Model
+        │                              │
+        ↓                              ↓
+ Baseline Result                64-D Latent Features
+                                       │
+                                       ├───────────────┐
+                                       │               │
+                                       ↓               ↓
+                                 Classification     MFCC Features
+                                       │               │
+                                       ↓               ↓
+                                  DSAE Result      Feature Fusion
+                                       │               │
+                                       ↓               ↓
+                              Classification       RBF-SVM
+                                Fine-Tuning            │
+                                       │               ↓
+                                       ↓          Fusion Result
+                                  Final DSAE
+                                  Prediction
+                                       │
+                                       ↓
+                                    62.83%
+
+MFCC Branch
+    ↓
+MFCC Feature Extraction
+    ↓
+RBF-SVM Classification
+    ↓
+95.09%
 ```
 
 ---
 
-## 15. Project Structure
+## 18. Project Structure
 
 ```text
 ML_Assignment/
@@ -384,7 +547,10 @@ ML_Assignment/
 │       ├── X_dev.npy
 │       ├── y_dev.npy
 │       ├── X_test.npy
-│       └── y_test.npy
+│       ├── y_test.npy
+│       ├── mfcc_train.npy
+│       ├── mfcc_dev.npy
+│       └── mfcc_test.npy
 │
 ├── autoencoder.py
 ├── baseline_model.py
@@ -392,13 +558,16 @@ ML_Assignment/
 ├── dsae_best.pth
 ├── dsae_finetune.py
 ├── dsae_finetuned.pth
+├── dsae_mfcc_fusion.py
+├── mfcc_features.py
+├── mfcc_svm.py
 ├── preprocess.py
 └── README.md
 ```
 
 ---
 
-## 16. File Description
+## 19. File Description
 
 | File | Purpose |
 |---|---|
@@ -409,11 +578,14 @@ ML_Assignment/
 | `dsae_best.pth` | Best trained DSAE checkpoint |
 | `dsae_finetune.py` | Performs classification-only fine-tuning |
 | `dsae_finetuned.pth` | Final fine-tuned DSAE checkpoint |
-| `Data/processed/` | Contains processed train/dev/test arrays |
+| `mfcc_features.py` | Extracts and saves MFCC features |
+| `mfcc_svm.py` | Trains and evaluates the RBF-SVM using MFCC features |
+| `dsae_mfcc_fusion.py` | Combines DSAE latent features with MFCC features and evaluates the fused representation |
+| `Data/processed/` | Contains processed train/dev/test and MFCC arrays |
 
 ---
 
-## 17. Installation
+## 20. Installation
 
 ### Requirements
 
@@ -431,7 +603,7 @@ pip install numpy torch librosa scikit-learn
 
 ---
 
-## 18. How to Run
+## 21. How to Run
 
 ### Step 1: Prepare the Dataset
 
@@ -502,9 +674,63 @@ The final model achieves:
 
 **Test Accuracy: 62.83%**
 
+### Step 6: Extract MFCC Features
+
+Run:
+
+```bash
+python mfcc_features.py
+```
+
+This generates:
+
+```text
+Data/processed/mfcc_train.npy
+Data/processed/mfcc_dev.npy
+Data/processed/mfcc_test.npy
+```
+
+### Step 7: Train the MFCC + RBF-SVM Model
+
+Run:
+
+```bash
+python mfcc_svm.py
+```
+
+The best configuration uses:
+
+```text
+C = 1
+Gamma = scale
+```
+
+The test accuracy is:
+
+**95.09%**
+
+### Step 8: Evaluate DSAE + MFCC Fusion
+
+Run:
+
+```bash
+python dsae_mfcc_fusion.py
+```
+
+The best configuration uses:
+
+```text
+C = 100
+Gamma = 0.001
+```
+
+The test accuracy is:
+
+**90.48%**
+
 ---
 
-## 19. Reproducibility
+## 22. Reproducibility
 
 The implementation uses:
 
@@ -512,17 +738,21 @@ The implementation uses:
 Random Seed = 42
 ```
 
-The training, development, and test datasets are kept separate.
+The same processed train, development, and test split is used across the experiments.
 
-The development set is used for model selection, while the test set is used for the final evaluation.
+The development set is used for model selection and hyperparameter evaluation, while the test set is used for final evaluation.
 
-The final reported test accuracy is:
+The final reported test accuracies are:
 
-**62.83%**
+```text
+DSAE + Fine-Tuning       = 62.83%
+MFCC + RBF-SVM           = 95.09%
+DSAE + MFCC + RBF-SVM    = 90.48%
+```
 
 ---
 
-## 20. Conclusion
+## 23. Conclusion
 
 This project demonstrates the use of a **Deep Softmax Autoencoder** for learning latent features directly from raw audio for musical genre classification.
 
@@ -534,11 +764,15 @@ Classification-only fine-tuning further improved the test accuracy to **62.83%**
 
 Therefore, the final system provides a substantial improvement over the baseline while approaching the **65.30%** test accuracy reported in the reference paper.
 
-The results also show that Classical music is classified most effectively, while Metal and Pop remain more challenging due to their higher degree of confusion.
+Additional experiments were performed using conventional **MFCC features**. The MFCC + RBF-SVM model achieved **95.09%** test accuracy.
+
+The combination of the **64-dimensional DSAE latent representation** and **78-dimensional MFCC representation** achieved **90.48%** test accuracy using an RBF-SVM.
+
+These experiments provide a comparison between learned raw-audio representations and conventional engineered audio features, while keeping the **DSAE as the main representation-learning approach** of the project.
 
 ---
 
-## 21. Reference
+## 24. Reference
 
 Sawhney, A., Vasavada, V., & Wang, W.
 
