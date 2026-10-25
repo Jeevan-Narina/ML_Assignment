@@ -679,7 +679,7 @@ The final model achieves:
 Run:
 
 ```bash
-python mfcc_features.py
+python mfcc_features.ipynb
 ```
 
 This generates:
@@ -695,7 +695,7 @@ Data/processed/mfcc_test.npy
 Run:
 
 ```bash
-python mfcc_svm.py
+python mfcc_svm.ipynb
 ```
 
 The best configuration uses:
@@ -714,7 +714,7 @@ The test accuracy is:
 Run:
 
 ```bash
-python dsae_mfcc_fusion.py
+python dsae_mfcc_fusion.ipynb
 ```
 
 The best configuration uses:
