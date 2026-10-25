@@ -552,16 +552,16 @@ ML_Assignment/
 │       ├── mfcc_dev.npy
 │       └── mfcc_test.npy
 │
-├── autoencoder.py
-├── baseline_model.py
-├── deep_softmax_autoencoder.py
+├── autoencoder.ipynb
+├── baseline_model.ipynb
+├── deep_softmax_autoencoder.ipynb
 ├── dsae_best.pth
-├── dsae_finetune.py
+├── dsae_finetune.ipynb
 ├── dsae_finetuned.pth
-├── dsae_mfcc_fusion.py
-├── mfcc_features.py
-├── mfcc_svm.py
-├── preprocess.py
+├── dsae_mfcc_fusion.ipynb
+├── mfcc_features.ipynb
+├── mfcc_svm.ipynb
+├── preprocess.ipynb
 └── README.md
 ```
 
@@ -571,16 +571,16 @@ ML_Assignment/
 
 | File | Purpose |
 |---|---|
-| `preprocess.py` | Processes raw audio and creates numerical input data |
-| `baseline_model.py` | Implements the baseline neural network |
-| `autoencoder.py` | Implements the vanilla autoencoder |
-| `deep_softmax_autoencoder.py` | Implements and trains the DSAE |
+| `preprocess.ipynb` | Processes raw audio and creates numerical input data |
+| `baseline_model.ipynb` | Implements the baseline neural network |
+| `autoencoder.ipynb` | Implements the vanilla autoencoder |
+| `deep_softmax_autoencoder.ipynb` | Implements and trains the DSAE |
 | `dsae_best.pth` | Best trained DSAE checkpoint |
-| `dsae_finetune.py` | Performs classification-only fine-tuning |
+| `dsae_finetune.ipynb` | Performs classification-only fine-tuning |
 | `dsae_finetuned.pth` | Final fine-tuned DSAE checkpoint |
-| `mfcc_features.py` | Extracts and saves MFCC features |
-| `mfcc_svm.py` | Trains and evaluates the RBF-SVM using MFCC features |
-| `dsae_mfcc_fusion.py` | Combines DSAE latent features with MFCC features and evaluates the fused representation |
+| `mfcc_features.ipynb` | Extracts and saves MFCC features |
+| `mfcc_svm.ipynb` | Trains and evaluates the RBF-SVM using MFCC features |
+| `dsae_mfcc_fusion.ipynb` | Combines DSAE latent features with MFCC features and evaluates the fused representation |
 | `Data/processed/` | Contains processed train/dev/test and MFCC arrays |
 
 ---
@@ -637,7 +637,7 @@ This generates the processed train, development, and test arrays.
 Run:
 
 ```bash
-python baseline_model.py
+python baseline_model.ipynb
 ```
 
 This trains and evaluates the baseline neural network.
@@ -647,7 +647,7 @@ This trains and evaluates the baseline neural network.
 Run:
 
 ```bash
-python deep_softmax_autoencoder.py
+python deep_softmax_autoencoder.ipynb
 ```
 
 This trains the Deep Softmax Autoencoder and saves:
@@ -661,7 +661,7 @@ dsae_best.pth
 Run:
 
 ```bash
-python dsae_finetune.py
+python dsae_finetune.ipynb
 ```
 
 This performs classification-only fine-tuning and saves:
