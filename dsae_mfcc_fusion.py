@@ -42,15 +42,15 @@ y_test = np.load("preprocessed/y_test.npy")
 # ============================================================
 
 mfcc_train = np.load(
-    "Data/processed/mfcc_train.npy"
+    "preprocessed/mfcc_train.npy"
 )
 
 mfcc_dev = np.load(
-    "Data/processed/mfcc_dev.npy"
+    "preprocessed/mfcc_dev.npy"
 )
 
 mfcc_test = np.load(
-    "Data/processed/mfcc_test.npy"
+    "preprocessed/mfcc_test.npy"
 )
 
 print("\nMFCC shapes:")
