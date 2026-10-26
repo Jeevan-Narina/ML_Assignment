@@ -6,14 +6,14 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 # LOAD V4 DATA
 # ============================================
 
-X_train = np.load("Data/processed/X_train_v4.npy")
-y_train = np.load("Data/processed/y_train_v4.npy")
+X_train = np.load("preprocessed/X_train_v4.npy")
+y_train = np.load("preprocessed/y_train_v4.npy")
 
-X_dev = np.load("Data/processed/X_dev_v4.npy")
-y_dev = np.load("Data/processed/y_dev_v4.npy")
+X_dev = np.load("preprocessed/X_dev_v4.npy")
+y_dev = np.load("preprocessed/y_dev_v4.npy")
 
-X_test = np.load("Data/processed/X_test_v4.npy")
-y_test = np.load("Data/processed/y_test_v4.npy")
+X_test = np.load("preprocessed/X_test_v4.npy")
+y_test = np.load("preprocessed/y_test_v4.npy")
 
 print("Training data:", X_train.shape)
 print("Development data:", X_dev.shape)
