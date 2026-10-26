@@ -41,14 +41,14 @@ print("Using device:", device)
 # LOAD V4 DATA
 # ============================================================
 
-X_train = np.load("Data/processed/X_train.npy")
-y_train = np.load("Data/processed/y_train.npy")
+X_train = np.load("preprocessed/X_train.npy")
+y_train = np.load("preprocessed/y_train.npy")
 
-X_dev = np.load("Data/processed/X_dev.npy")
-y_dev = np.load("Data/processed/y_dev.npy")
+X_dev = np.load("preprocessed/X_dev.npy")
+y_dev = np.load("preprocessed/y_dev.npy")
 
-X_test = np.load("Data/processed/X_test.npy")
-y_test = np.load("Data/processed/y_test.npy")
+X_test = np.load("preprocessed/X_test.npy")
+y_test = np.load("preprocessed/y_test.npy")
 
 # ============================================================
 # DATASETS
