@@ -8,13 +8,13 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 # 1. LOAD DATA
 # ============================================================
 
-X_train = np.load("Data/processed/mfcc_train.npy")
-X_dev = np.load("Data/processed/mfcc_dev.npy")
-X_test = np.load("Data/processed/mfcc_test.npy")
+X_train = np.load("preprocessed/mfcc_train.npy")
+X_dev = np.load("preprocessed/mfcc_dev.npy")
+X_test = np.load("preprocessed/mfcc_test.npy")
 
-y_train = np.load("Data/processed/y_train.npy")
-y_dev = np.load("Data/processed/y_dev.npy")
-y_test = np.load("Data/processed/y_test.npy")
+y_train = np.load("preprocessed/y_train.npy")
+y_dev = np.load("preprocessed/y_dev.npy")
+y_test = np.load("preprocessed/y_test.npy")
 
 print("MFCC RBF-SVM")
 print("=" * 60)
